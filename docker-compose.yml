@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  backend-1:
+    image: web-worker
+    restart: on-failure
+    volumes:
+      - ./storage:/storage
+    ports:
+      - "8081:8080"
+  backend-2:
+    image: web-worker
+    restart: on-failure
+    volumes:
+      - ./storage:/storage
+    ports:
+      - "8082:8080"
+  backend-3:
+    image: web-worker
+    restart: on-failure
+    volumes:
+      - ./storage:/storage
+    ports:
+      - "8083:8080"
+  backend-4:
+    image: web-worker
+    restart: on-failure
+    volumes:
+      - ./storage:/storage
+    ports:
+      - "8084:8080"
+
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend:/usr/share/nginx/html
+    ports:
+      - "80:80"

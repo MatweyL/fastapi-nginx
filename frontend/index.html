@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>DDS Files Uploading</title>
+</head>
+<body>
+	<div>
+		<h2>Загрузка файла на сервер</h2>
+		<form>
+			<input type="file" id="input-file">
+			<br>
+			<button type="button" id="upload-file-button">Загрузить</button>
+		</form>
+	</div>
+	<div>
+		<h2>Список файлов на сервере</h2>
+		<button type="button" id="update-uploaded-files-button">Обновить</button>
+		<div id="uploaded-files"></div>
+	</div>
+	<script type="text/javascript">
+		let apiHost = "http://localhost";
+		let formFileInput = document.getElementById("input-file");
+		let filesList = document.getElementById("uploaded-files");
+
+		function uploadFile() {
+			let formFile = formFileInput.files[0];
+			if (typeof(formFile) === 'undefined') {
+				alert('Выберите файл')
+				return;
+			}
+			let formData = new FormData();
+			formData.append("file", formFile);
+			fetch(`${apiHost}/files/upload`, {method: "POST", body: formData})
+			.then(response => updateUploadedFiles());
+		}
+
+		function getNameFromFilePath(filePath) {
+			let reversedFilePath = filePath.split('').reverse().join('');
+			let slashIndex = reversedFilePath.indexOf('/');
+			if (slashIndex === -1) {
+			    slashIndex = 0;
+			}
+			return filePath.slice(-slashIndex)
+		}
+		function updateUploadedFiles() {
+			fetch(`${apiHost}/files`, {method: "GET"})
+			.then(response => response.json())
+  			.then(filesPaths => {
+  				filesList.innerHTML = "";
+  				filesPaths.forEach(filePath => {
+  					let divElement = document.createElement('div');
+  					let aElement = document.createElement('a');
+  					aElement.href = filePath;
+  					aElement.textContent = getNameFromFilePath(filePath);
+  					divElement.appendChild(aElement);
+  					filesList.appendChild(divElement);
+  				}); 
+  			});
+		}
+
+		let uploadButton = document.getElementById("upload-file-button");
+		let updateUploadedFilesButton = document.getElementById("update-uploaded-files-button");
+		uploadButton.onclick = uploadFile;
+		updateUploadedFilesButton.onclick = updateUploadedFiles;
+		updateUploadedFiles();
+	</script>
+</body>
+</html>
